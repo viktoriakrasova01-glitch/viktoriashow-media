@@ -1,0 +1,38 @@
+name: Автопостинг Instagram
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'     # каждые 10 минут; GitHub иногда запускает с опозданием на несколько минут
+  workflow_dispatch:            # ручной запуск из вкладки Actions
+
+concurrency:
+  group: autopost
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Опубликовать всё, чему пришло время
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          VK_TOKEN: ${{ secrets.VK_TOKEN }}
+        run: python3 publish.py
+      - name: Сохранить статусы в очереди
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "autopost"
+            git config user.email "autopost@users.noreply.github.com"
+            git add -A
+            git commit -m "Автопостинг: статусы очереди"
+            git pull --rebase
+            git push
+          fi
