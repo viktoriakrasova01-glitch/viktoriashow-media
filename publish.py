@@ -15,9 +15,14 @@ import urllib.request
 
 GRAPH = 'https://graph.instagram.com/v21.0'
 RAW = 'https://raw.githubusercontent.com/viktoriakrasova01-glitch/viktoriashow-media/main/'
-TOKEN = os.environ['IG_TOKEN']
-USER_ID = os.environ['IG_USER_ID']
-VK_TOKEN = os.environ.get('VK_TOKEN')
+def secret(name):
+    """Секреты, переданные из Windows PowerShell, могут прийти с невидимым BOM (\\ufeff) и переводом строки."""
+    return (os.environ.get(name) or '').strip().lstrip('﻿').strip()
+
+
+TOKEN = secret('IG_TOKEN')
+USER_ID = secret('IG_USER_ID')
+VK_TOKEN = secret('VK_TOKEN') or None
 VK_NOTIFY = 8742473          # кому во ВК приходят уведомления (Виктория)
 
 
@@ -92,6 +97,7 @@ def notify(text):
 
 
 def main():
+    print('Аккаунт:', ig('GET', 'me', {'fields': 'username'})['username'])   # заодно проверка, что ключ рабочий
     now = datetime.datetime.now(datetime.timezone.utc)
     for path in sorted(glob.glob('queue/*/post.json')):
         folder = os.path.dirname(path).replace('\\', '/')
