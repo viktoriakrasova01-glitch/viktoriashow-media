@@ -24,6 +24,8 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_TOKEN_STUDIO: ${{ secrets.IG_TOKEN_STUDIO }}
+          IG_USER_ID_STUDIO: ${{ secrets.IG_USER_ID_STUDIO }}
           VK_TOKEN: ${{ secrets.VK_TOKEN }}
         run: python3 publish.py
       - name: Сохранить статусы в очереди

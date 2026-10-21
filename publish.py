@@ -1,4 +1,4 @@
-"""Облачный автопостинг Instagram для @viktoriashow.official (запускается GitHub Actions каждые 10 минут).
+"""Облачный автопостинг Instagram для @viktoriashow.official и студии @dance_studio_viktoria (запускается GitHub Actions каждые 10 минут).
 
 Очередь — папки queue/<id>/ с post.json и готовыми файлами (их заранее готовит instagram.ps1 -Add на ноутбуке).
 Instagram сам скачивает файлы по ссылкам raw.githubusercontent.com, поэтому они лежат в этом публичном репозитории
@@ -20,8 +20,19 @@ def secret(name):
     return (os.environ.get(name) or '').strip().lstrip('﻿').strip()
 
 
-TOKEN = secret('IG_TOKEN')
-USER_ID = secret('IG_USER_ID')
+# Аккаунты: поле "account" в post.json (по умолчанию show)
+ACCOUNTS = {
+    'show':   (secret('IG_TOKEN'), secret('IG_USER_ID'), 'Instagram шоу'),
+    'studio': (secret('IG_TOKEN_STUDIO'), secret('IG_USER_ID_STUDIO'), 'Instagram студии'),
+}
+TOKEN, USER_ID, LABEL = ACCOUNTS['show']
+
+
+def use_account(name):
+    global TOKEN, USER_ID, LABEL
+    TOKEN, USER_ID, LABEL = ACCOUNTS[name]
+    if not TOKEN or not USER_ID:
+        raise RuntimeError(f'Нет ключа для аккаунта {name}')
 VK_TOKEN = secret('VK_TOKEN') or None
 VK_NOTIFY = 8742473          # кому во ВК приходят уведомления (Виктория)
 
@@ -97,7 +108,6 @@ def notify(text):
 
 
 def main():
-    print('Аккаунт:', ig('GET', 'me', {'fields': 'username'})['username'])   # заодно проверка, что ключ рабочий
     now = datetime.datetime.now(datetime.timezone.utc)
     for path in sorted(glob.glob('queue/*/post.json')):
         folder = os.path.dirname(path).replace('\\', '/')
@@ -105,11 +115,12 @@ def main():
             post = json.load(fh)
         if post.get('status') != 'ждёт' or datetime.datetime.fromisoformat(post['when']) > now:
             continue
-        print('Публикую', post['id'])
+        print('Публикую', post['id'], post.get('account', 'show'))
         try:
+            use_account(post.get('account', 'show'))
             post['permalink'] = publish_post(post, folder)
             post['status'] = 'вышел'
-            notify(f'✅ Вышел пост в Instagram: {post["permalink"]}')
+            notify(f'✅ Вышел пост в {LABEL}: {post["permalink"]}')
             try:
                 time.sleep(30)
                 publish_story(post, folder)
@@ -120,7 +131,7 @@ def main():
             post['status'] = 'ошибка'
             post['error'] = str(e)[:500]
             print('Ошибка:', e)
-            notify(f'⚠️ Не вышел пост в Instagram «{post["id"]}». Напишите Claude: «почему не вышло в Instagram?»')
+            notify(f'⚠️ Не вышел пост в {LABEL} «{post["id"]}». Напишите Claude: «почему не вышло в Instagram?»')
         post['done_at'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         with open(path, 'w', encoding='utf-8') as fh:
             json.dump(post, fh, ensure_ascii=False, indent=2)
