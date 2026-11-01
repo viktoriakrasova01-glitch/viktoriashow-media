@@ -1,20 +1,21 @@
 {
-    "id":  "01.11 19-00 Русский номер",
-    "account":  "show",
-    "when":  "2026-11-01T19:00:00+03:00",
-    "text":  "❤️ Русский номер в народных костюмах\n\nКрасно-белая роспись, широкие рукава, задор и настоящий русский размах. Этот номер зажигает зал с первых тактов и становится ярким акцентом юбилея, свадьбы, корпоратива или тематического вечера ✨\n\nЛистайте карусель → наша команда на закате.\n\nДату и формат — в директ 👇\n\n#русскийномер #народныйтанец #шоубалет #артистынапраздник #корпоративворонеж #воронеж #viktoriashow",
-    "files":  [
-                  "1.jpg",
-                  "2.jpg",
-                  "3.jpg",
-                  "4.jpg",
-                  "5.jpg",
-                  "6.jpg",
-                  "7.jpg",
-                  "8.jpg"
-              ],
-    "story":  "story.jpg",
-    "status":  "ждёт",
-    "permalink":  null,
-    "error":  null
+  "id": "01.11 19-00 Русский номер",
+  "account": "show",
+  "when": "2026-11-01T19:00:00+03:00",
+  "text": "❤️ Русский номер в народных костюмах\n\nКрасно-белая роспись, широкие рукава, задор и настоящий русский размах. Этот номер зажигает зал с первых тактов и становится ярким акцентом юбилея, свадьбы, корпоратива или тематического вечера ✨\n\nЛистайте карусель → наша команда на закате.\n\nДату и формат — в директ 👇\n\n#русскийномер #народныйтанец #шоубалет #артистынапраздник #корпоративворонеж #воронеж #viktoriashow",
+  "files": [
+    "1.jpg",
+    "2.jpg",
+    "3.jpg",
+    "4.jpg",
+    "5.jpg",
+    "6.jpg",
+    "7.jpg",
+    "8.jpg"
+  ],
+  "story": "story.jpg",
+  "status": "ошибка",
+  "permalink": null,
+  "error": "Instagram 17841407917718819/media — 400 {\"error\":{\"message\":\"Only photo or video can be accepted as media type.\",\"type\":\"OAuthException\",\"code\":9004,\"error_subcode\":2207052,\"is_transient\":false,\"error_user_title\":\"Media download has failed. The media URI doesn't meet our requirements.\",\"error_user_msg\":\"The media could not be fetched from this URI: https:\\/\\/raw.githubusercontent.com\\/viktoriakrasova01-glitch\\/viktoriashow-media\\/main\\/queue\\/20261101-1900-8a2bd1\\/8.jpg.Please check the limitati",
+  "done_at": "2026-11-01T20:17:20.495214+00:00"
 }
