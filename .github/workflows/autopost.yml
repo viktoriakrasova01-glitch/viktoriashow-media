@@ -26,6 +26,8 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           IG_TOKEN_STUDIO: ${{ secrets.IG_TOKEN_STUDIO }}
           IG_USER_ID_STUDIO: ${{ secrets.IG_USER_ID_STUDIO }}
+          IG_TOKEN_MARTA: ${{ secrets.IG_TOKEN_MARTA }}
+          IG_USER_ID_MARTA: ${{ secrets.IG_USER_ID_MARTA }}
           VK_TOKEN: ${{ secrets.VK_TOKEN }}
         run: python3 publish.py
       - name: Сохранить статусы в очереди

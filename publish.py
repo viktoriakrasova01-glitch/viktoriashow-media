@@ -24,6 +24,7 @@ def secret(name):
 ACCOUNTS = {
     'show':   (secret('IG_TOKEN'), secret('IG_USER_ID'), 'Instagram шоу'),
     'studio': (secret('IG_TOKEN_STUDIO'), secret('IG_USER_ID_STUDIO'), 'Instagram студии'),
+    'marta':  (secret('IG_TOKEN_MARTA'), secret('IG_USER_ID_MARTA'), 'Instagram Марты'),
 }
 TOKEN, USER_ID, LABEL = ACCOUNTS['show']
 
