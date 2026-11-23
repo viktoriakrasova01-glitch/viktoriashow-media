@@ -108,17 +108,62 @@ def notify(text):
         print('Не смогла отправить уведомление во ВК:', e)
 
 
+STATE = 'state/alerts.json'
+LATE = datetime.timedelta(hours=12)   # пост, опоздавший больше чем на 12 ч (не работал ключ), сам не выходит — ждёт нового времени
+
+
+def check_tokens(today):
+    """Раз в сутки по каждой странице: живой ли ключ. Не живой — сообщение Виктории (не чаще раза в день)."""
+    try:
+        with open(STATE, encoding='utf-8') as fh:
+            st = json.load(fh)
+    except Exception:
+        st = {}
+    ok = {}
+    for name, (tok, uid, label) in ACCOUNTS.items():
+        if not tok or not uid:
+            ok[name] = False
+            continue
+        try:
+            use_account(name)
+            ig('GET', 'me', {'fields': 'username'})
+            ok[name] = True
+            st.pop(name, None)
+        except Exception as e:
+            ok[name] = False
+            print(f'Ключ {label} не работает:', str(e)[:200])
+            if st.get(name) != today:
+                st[name] = today
+                notify(f'⚠️ {label}: ключ автопостинга не работает — посты этой страницы ждут и не выходят. '
+                       f'Напишите Claude: «переподключи Instagram».')
+    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    with open(STATE, 'w', encoding='utf-8') as fh:
+        json.dump(st, fh, ensure_ascii=False, indent=2)
+    return ok
+
+
 def main():
     now = datetime.datetime.now(datetime.timezone.utc)
+    alive = check_tokens(now.astimezone(datetime.timezone(datetime.timedelta(hours=3))).date().isoformat())
     for path in sorted(glob.glob('queue/*/post.json')):
         folder = os.path.dirname(path).replace('\\', '/')
         with open(path, encoding='utf-8') as fh:
             post = json.load(fh)
         if post.get('status') != 'ждёт' or datetime.datetime.fromisoformat(post['when']) > now:
             continue
-        print('Публикую', post['id'], post.get('account', 'show'))
+        acc = post.get('account', 'show')
+        if not alive.get(acc):
+            continue   # ключ не работает — пост ждёт, Виктории уже сообщили
+        if now - datetime.datetime.fromisoformat(post['when']) > LATE:
+            post['status'] = 'просрочен'
+            notify(f'⏰ Пост «{post["id"]}» в {ACCOUNTS[acc][2]} не вышел вовремя (не работал ключ). '
+                   f'Напишите Claude новое время для него.')
+            with open(path, 'w', encoding='utf-8') as fh:
+                json.dump(post, fh, ensure_ascii=False, indent=2)
+            continue
+        print('Публикую', post['id'], acc)
         try:
-            use_account(post.get('account', 'show'))
+            use_account(acc)
             post['permalink'] = publish_post(post, folder)
             post['status'] = 'вышел'
             notify(f'✅ Вышел пост в {LABEL}: {post["permalink"]}')
